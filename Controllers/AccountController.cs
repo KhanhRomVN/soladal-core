@@ -126,14 +126,14 @@ namespace soladal_core.Controllers
             }
         }
 
-        [HttpGet("group/{group}")]
-        public async Task<ActionResult<IEnumerable<Account>>> GetAccountByGroup(string group)
+        [HttpGet("group/{group_id}")]
+        public async Task<ActionResult<IEnumerable<Account>>> GetAccountByGroup(int group_id)
         {
             try
             {
                 int userId = GetUserIdFromToken();
                 return await _context.Accounts
-                    .Where(a => a.UserId == userId && a.GroupId.ToString() == group)
+                    .Where(a => a.UserId == userId && a.GroupId == group_id)
                     .ToListAsync();
             }
             catch (UnauthorizedAccessException)
