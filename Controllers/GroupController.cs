@@ -31,7 +31,7 @@ namespace soladal_core.Controllers
         public async Task<ActionResult<Group>> CreateGroup(Group group)
         {
             int userId = GetUserIdFromToken();
-            var groupData = new Group { UserId = userId, Title = group.Title, CanDelete = false, LucideIcon = group.LucideIcon };
+            var groupData = new Group { UserId = userId, Title = group.Title, CanDelete = false, LucideIcon = group.LucideIcon, Type = group.Type };
             _context.Groups.Add(groupData);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetAllGroupByUserId), new { id = groupData.Id }, groupData);
@@ -41,6 +41,7 @@ namespace soladal_core.Controllers
         public async Task<ActionResult<IEnumerable<Group>>> GetAllGroupByUserId()
         {
             int userId = GetUserIdFromToken();
+            Console.WriteLine(userId);
             return await _context.Groups.Where(g => g.UserId == userId).ToListAsync();
         }
 

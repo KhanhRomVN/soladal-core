@@ -4,6 +4,8 @@ namespace soladal_core.Data
     {
         public int Id { get; set; }
         public int UserId { get; set; }
+        public required int GroupId { get; set; } = -1;
+        public required string Type { get; set; }
         // Personal
         public required string Firstname { get; set; } = "";
         public required string Lastname { get; set; } = "";

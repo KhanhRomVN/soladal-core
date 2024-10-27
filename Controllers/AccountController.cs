@@ -49,7 +49,7 @@ namespace soladal_core.Controllers
                     Password = accountDto.Password ?? "",
                     IsFavorite = accountDto.IsFavorite,
                     Notes = accountDto.Notes ?? "",
-
+                    Type = accountDto.Type,
                 };
 
                 _context.Accounts.Add(account);

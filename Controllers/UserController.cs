@@ -23,68 +23,21 @@ namespace soladal_core.Controllers
         [HttpPost]
         public async Task<ActionResult<string>> Register(User user)
         {
+            // Check if username or email already exists
+            if (await _context.Users.AnyAsync(u => u.Username == user.Username))
+            {
+                return BadRequest("Username is already taken.");
+            }
+
+            if (await _context.Users.AnyAsync(u => u.Email == user.Email))
+            {
+                return BadRequest("Email is already registered.");
+            }
+
             // Hash the password before saving
             user.Password = HashPassword(user.Password);
 
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            // Create default group for new user
-            var allGroups = new Group
-            {
-                UserId = user.Id,
-                Title = "All Groups",
-                CanDelete = false,
-                LucideIcon = "archive",
-            };
-
-            var cardGroup = new Group
-            {
-                UserId = user.Id,
-                Title = "Cards",
-                CanDelete = false,
-                LucideIcon = "credit-card",
-            };
-
-            var cloneGroup = new Group
-            {
-                UserId = user.Id,
-                Title = "Clones",
-                CanDelete = false,
-                LucideIcon = "copy",
-            };
-
-            var googleGroup = new Group
-            {
-                UserId = user.Id,
-                Title = "Googles",
-                CanDelete = false,
-                LucideIcon = "google",
-            };
-
-            var identityGroup = new Group
-            {
-                UserId = user.Id,
-                Title = "Identities",
-                CanDelete = false,
-                LucideIcon = "user",
-            };
-
-            var notesGroup = new Group
-            {
-                UserId = user.Id,
-                Title = "Notes",
-                CanDelete = false,
-                LucideIcon = "file-text",
-            };
-
-            _context.Groups.Add(allGroups);
-            _context.Groups.Add(cardGroup);
-            _context.Groups.Add(cloneGroup);
-            _context.Groups.Add(googleGroup);
-            _context.Groups.Add(identityGroup);
-            _context.Groups.Add(notesGroup);
-
             await _context.SaveChangesAsync();
             return Ok("Registration completed successfully.");
         }

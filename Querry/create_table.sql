@@ -1,9 +1,10 @@
 CREATE TABLE `defaultdb`.`Accounts` (
     `Id` INT PRIMARY KEY AUTO_INCREMENT,
     `UserId` INT NOT NULL,
-    `Title` VARCHAR(255) NOT NULL,
-    `GroupId` INT NOT NULL DEFAULT 0,
-    `Website_URL` VARCHAR(255) DEFAULT '',
+    `Title` VARCHAR(255) NOT NULL DEFAULT '',
+    `Type` VARCHAR(255) NOT NULL,
+    `GroupId` INT NOT NULL DEFAULT -1,
+    `Website_URL` VARCHAR(255),
     `Username` VARCHAR(255) DEFAULT '',
     `Email` VARCHAR(255) DEFAULT '',
     `Phone` VARCHAR(50) DEFAULT '',
@@ -27,10 +28,13 @@ CREATE TABLE `defaultdb`.`Notes` (
 );
 
 CREATE TABLE `defaultdb`.`Groups` (
-    `Id` INT AUTO_INCREMENT,
-    `UserId` INT PRIMARY KEY NOT NULL,
+    `Id` INT AUTO_INCREMENT PRIMARY KEY,
+    `UserId` INT NOT NULL,
     `Title` VARCHAR(255) NOT NULL,
-    `Description` VARCHAR(1000) DEFAULT '',
+    `Type` VARCHAR(50) NOT NULL,
+    `LucideIcon` VARCHAR(255) DEFAULT '<Archive className="h-4 w-4 text-icon-primary" />',
+    `CanDelete` BOOLEAN NOT NULL,
+    `IsFavorite` BOOLEAN DEFAULT FALSE,
     `CreatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `UpdatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
