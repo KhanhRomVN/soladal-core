@@ -1,23 +1,36 @@
 global using soladal_core.Data;
-// using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-// using soladal_core.Middleware;
-using Microsoft.AspNetCore.Authentication.JwtBearer; // Add this line
-using Microsoft.IdentityModel.Tokens; // Add this line
-using System.Text; // Add this line
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), 
-    new MySqlServerVersion(new Version(8, 0, 21)))); 
+// Cors
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:5173")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
 
-// builder.Services.AddRateLimiter(options =>
-// {
-//     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext>(context =>
-//         RateLimitPartition.GetFixedWindowLimiter("global", TimeSpan.FromMinutes(1), 10));
-// });
+// DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
+    new MySqlServerVersion(new Version(8, 0, 21))));
+
+// Authentication
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new InvalidOperationException("JWT Key is not configured.");
+}
 
 builder.Services.AddAuthentication(options =>
 {
@@ -29,17 +42,19 @@ builder.Services.AddAuthentication(options =>
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        // Ensure this key is at least 16 characters long (128 bits)
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_super_secret_key_here_12345")), // Example key 
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
         ValidateIssuer = false,
         ValidateAudience = false
     };
 });
 
-
+// Endpoints
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddControllers(); 
 
+// Controllers
+builder.Services.AddControllers();
+
+// Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
@@ -47,19 +62,25 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-app.UseAuthentication(); 
-app.UseAuthorization(); 
+// Middleware
+app.UseRouting();
+app.UseStaticFiles();
+app.UseCors(MyAllowSpecificOrigins);
+app.UseAuthentication();
+app.UseAuthorization();
 
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c => 
+    app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
     });
 }
 
+// Middleware
 app.UseHttpsRedirection();
-app.MapControllers(); 
+app.MapControllers();
 
 app.Run();

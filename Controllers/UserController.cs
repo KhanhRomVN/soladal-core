@@ -1,20 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-
-
-using BCrypt.Net;
-
-
 
 namespace soladal_core.Controllers
 {
-
-
-
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -33,22 +21,80 @@ namespace soladal_core.Controllers
 
         // Register: api/users
         [HttpPost]
-        public async Task<ActionResult<string>> PostUser(User user)
+        public async Task<ActionResult<string>> Register(User user)
         {
             // Hash the password before saving
             user.Password = HashPassword(user.Password);
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
+            // Create default group for new user
+            var allGroups = new Group
+            {
+                UserId = user.Id,
+                Title = "All Groups",
+                CanDelete = false,
+                LucideIcon = "archive",
+            };
+
+            var cardGroup = new Group
+            {
+                UserId = user.Id,
+                Title = "Cards",
+                CanDelete = false,
+                LucideIcon = "credit-card",
+            };
+
+            var cloneGroup = new Group
+            {
+                UserId = user.Id,
+                Title = "Clones",
+                CanDelete = false,
+                LucideIcon = "copy",
+            };
+
+            var googleGroup = new Group
+            {
+                UserId = user.Id,
+                Title = "Googles",
+                CanDelete = false,
+                LucideIcon = "google",
+            };
+
+            var identityGroup = new Group
+            {
+                UserId = user.Id,
+                Title = "Identities",
+                CanDelete = false,
+                LucideIcon = "user",
+            };
+
+            var notesGroup = new Group
+            {
+                UserId = user.Id,
+                Title = "Notes",
+                CanDelete = false,
+                LucideIcon = "file-text",
+            };
+
+            _context.Groups.Add(allGroups);
+            _context.Groups.Add(cardGroup);
+            _context.Groups.Add(cloneGroup);
+            _context.Groups.Add(googleGroup);
+            _context.Groups.Add(identityGroup);
+            _context.Groups.Add(notesGroup);
+
+            await _context.SaveChangesAsync();
             return Ok("Registration completed successfully.");
         }
 
         // Login: api/users/login
         [HttpPost("login")]
-        public async Task<ActionResult<string>> Login(User user)
+        public async Task<ActionResult<string>> Login(UserLogin user)
         {
             var existingUser = await _context.Users
-                .FirstOrDefaultAsync(u => u.Username == user.Username);
+                .FirstOrDefaultAsync(u => u.Email == user.Email);
 
             if (existingUser == null || !BCrypt.Net.BCrypt.Verify(user.Password, existingUser.Password))
             {

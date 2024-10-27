@@ -6,7 +6,7 @@ using DotNetEnv;
 
 public class AuthToken
 {
-    private static readonly string SecretKey = Env.GetString("JWT_KEY");
+    private static readonly string SecretKey = "your_super_secret_key_here_12345";
     public string GenerateToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -19,7 +19,7 @@ public class AuthToken
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim("UserId", user.Id.ToString())
             }),
-            Expires = DateTime.UtcNow.AddHours(1),
+            Expires = DateTime.UtcNow.AddHours(100),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
         var token = tokenHandler.CreateToken(tokenDescriptor);
