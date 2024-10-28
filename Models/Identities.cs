@@ -9,7 +9,7 @@ namespace soladal_core.Data
         // Personal
         public string Firstname { get; set; } = "";
         public string Lastname { get; set; } = "";
-        public DateTime DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; } = "";
         public string Gender { get; set; } = "";
         public string Country { get; set; } = "";
         public string City { get; set; } = "";
@@ -17,22 +17,22 @@ namespace soladal_core.Data
         public string Zipcode { get; set; } = "";
 
         // Passport
-        public string PassportID { get; set; } = ""; 
+        public string PassportID { get; set; } = "";
         public string PassportIssuedBy { get; set; } = "";
-        public DateTime PassportIssuedDate { get; set; }
-        public DateTime PassportExpiredDate { get; set; }
+        public string PassportIssuedDate { get; set; } = "";
+        public string PassportExpiredDate { get; set; } = "";
 
         // ID Card
         public string IDCardID { get; set; } = "";
         public string IDCardIssuedBy { get; set; } = "";
-        public DateTime IDCardIssuedDate { get; set; }
-        public DateTime IDCardExpiredDate { get; set; }
+        public string IDCardIssuedDate { get; set; } = "";
+        public string IDCardExpiredDate { get; set; } = "";
 
         // Driving License
         public string DrivingLicenseID { get; set; } = "";
         public string DrivingLicenseIssuedBy { get; set; } = "";
-        public DateTime DrivingLicenseIssuedDate { get; set; }
-        public DateTime DrivingLicenseExpiredDate { get; set; }
+        public string DrivingLicenseIssuedDate { get; set; } = "";
+        public string DrivingLicenseExpiredDate { get; set; } = "";
 
         // Contact
         public string Phone { get; set; } = "";
@@ -44,8 +44,8 @@ namespace soladal_core.Data
         public string JobTitle { get; set; } = "";
         public string JobCompany { get; set; } = "";
         public string JobDescription { get; set; } = "";
-        public DateTime JobStartDate { get; set; }
-        public DateTime JobEndDate { get; set; }
+        public string JobStartDate { get; set; } = "";
+        public string JobEndDate { get; set; } = "";
 
         // Other
         public bool IsFavorite { get; set; } = false;

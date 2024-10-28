@@ -14,7 +14,7 @@ namespace soladal_core.Data
         public DbSet<Note> Notes { get; set; }
         public DbSet<Card> Cards { get; set; }
         public DbSet<Clone> Clones { get; set; }
-        public DbSet<Google> Googles { get; set; }
+        public DbSet<GoogleAccount> GoogleAccounts { get; set; }
         public DbSet<Identity> Identities { get; set; }
 
     }

@@ -29,6 +29,7 @@ namespace soladal_core.Controllers
             return int.Parse(userIdClaim.Value);
         }
 
+        // Create card: /api/cards
         [HttpPost]
         public async Task<ActionResult<Card>> CreateCard(Card cardDto)
         {
@@ -66,6 +67,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get card by id: /api/cards/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Card>> GetCardById(int id)
         {
@@ -87,6 +89,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get all cards: /api/cards
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Card>>> GetAllCards()
         {
@@ -101,6 +104,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get cards by group: /api/cards/group/{group_id}
         [HttpGet("group/{group_id}")]
         public async Task<ActionResult<IEnumerable<Card>>> GetCardsByGroup(int group_id)
         {
@@ -117,6 +121,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get cards by title: /api/cards/title/{title}
         [HttpGet("title/{title}")]
         public async Task<ActionResult<IEnumerable<Card>>> GetCardsByTitle(string title)
         {
@@ -133,6 +138,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Change favorite status: /api/cards/favorite/{id}
         [HttpPut("favorite/{id}")]
         public async Task<ActionResult<Card>> ChangeFavoriteStatus(int id, bool isFavorite)
         {
@@ -158,6 +164,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Update card: /api/cards/{id}
         [HttpPut("{id}")]
         public async Task<ActionResult<Card>> UpdateCard(int id, Card card)
         {
@@ -196,6 +203,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Delete card: /api/cards/{id}
         [HttpDelete("{id}")]
         public async Task<ActionResult<Card>> DeleteCard(int id)
         {
