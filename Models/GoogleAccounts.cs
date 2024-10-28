@@ -1,6 +1,6 @@
 namespace soladal_core.Data
 {
-    public class Google
+    public class GoogleAccount
     {
         // Primary keys and relationships
         public int Id { get; set; }
@@ -17,7 +17,7 @@ namespace soladal_core.Data
         // Personal information
         public string Phone { get; set; } = "";
         public string DisplayName { get; set; } = "";
-        public DateTime DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; } = "";
 
         // Regional settings
         public string Country { get; set; } = "";

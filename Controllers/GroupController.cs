@@ -41,8 +41,14 @@ namespace soladal_core.Controllers
         public async Task<ActionResult<IEnumerable<Group>>> GetAllGroupByUserId()
         {
             int userId = GetUserIdFromToken();
-            Console.WriteLine(userId);
             return await _context.Groups.Where(g => g.UserId == userId).ToListAsync();
+        }
+
+        [HttpGet("{type}")]
+        public async Task<ActionResult<IEnumerable<Group>>> GetGroupByUserIdAndType(string type)
+        {
+            int userId = GetUserIdFromToken();
+            return await _context.Groups.Where(g => g.UserId == userId && g.Type == type).ToListAsync();
         }
 
         [HttpPut("addItem/{id}")]

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using soladal_core.Data;
 
 namespace soladal_core.Controllers
 {
@@ -29,6 +28,7 @@ namespace soladal_core.Controllers
             return int.Parse(userIdClaim.Value);
         }
 
+        // Create identity: /api/identities
         [HttpPost]
         public async Task<ActionResult<Identity>> CreateIdentity(Identity identityDto)
         {
