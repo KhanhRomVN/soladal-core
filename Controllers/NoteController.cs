@@ -35,6 +35,13 @@ namespace soladal_core.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
+
+                var group = await _context.Groups.FirstOrDefaultAsync(g => g.Id == noteDto.GroupId);
+                if (group == null || group.Type != noteDto.Type)
+                {
+                    return BadRequest("Note type must match with Group type");
+                }
+
                 var note = new Note
                 {
                     UserId = userId,

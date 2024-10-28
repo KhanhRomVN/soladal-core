@@ -30,12 +30,19 @@ namespace soladal_core.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Indentify>> CreateIdentity(Indentify identityDto)
+        public async Task<ActionResult<Identity>> CreateIdentity(Identity identityDto)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var identity = new Indentify
+
+                var group = await _context.Groups.FirstOrDefaultAsync(g => g.Id == identityDto.GroupId);
+                if (group == null || group.Type != identityDto.Type)
+                {
+                    return BadRequest("Identity type must match with Group type");
+                }
+
+                var identity = new Identity
                 {
                     UserId = userId,
                     Type = identityDto.Type,
@@ -83,7 +90,7 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Indentify>> GetIdentityById(int id)
+        public async Task<ActionResult<Identity>> GetIdentityById(int id)
         {
             try
             {
@@ -104,7 +111,7 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Indentify>>> GetAllIdentities()
+        public async Task<ActionResult<IEnumerable<Identity>>> GetAllIdentities()
         {
             try
             {
@@ -118,7 +125,7 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet("group/{group_id}")]
-        public async Task<ActionResult<IEnumerable<Indentify>>> GetIdentitiesByGroup(int group_id)
+        public async Task<ActionResult<IEnumerable<Identity>>> GetIdentitiesByGroup(int group_id)
         {
             try
             {
@@ -134,7 +141,7 @@ namespace soladal_core.Controllers
         }
 
         [HttpPut("favorite/{id}")]
-        public async Task<ActionResult<Indentify>> ChangeFavoriteStatus(int id, bool isFavorite)
+        public async Task<ActionResult<Identity>> ChangeFavoriteStatus(int id, bool isFavorite)
         {
             try
             {
@@ -159,7 +166,7 @@ namespace soladal_core.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Indentify>> UpdateIdentity(int id, Indentify identity)
+        public async Task<ActionResult<Identity>> UpdateIdentity(int id, Identity identity)
         {
             try
             {
@@ -197,7 +204,7 @@ namespace soladal_core.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Indentify>> DeleteIdentity(int id)
+        public async Task<ActionResult<Identity>> DeleteIdentity(int id)
         {
             try
             {

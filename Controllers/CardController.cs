@@ -35,6 +35,13 @@ namespace soladal_core.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
+
+                var group = await _context.Groups.FirstOrDefaultAsync(g => g.Id == cardDto.GroupId);
+                if (group == null || group.Type != cardDto.Type)
+                {
+                    return BadRequest("Card type must match with Group type");
+                }
+
                 var card = new Card
                 {
                     UserId = userId,
