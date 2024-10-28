@@ -7,13 +7,13 @@ namespace soladal_core.Data
         public required int GroupId { get; set; } = -1;
         public required string Type { get; set; }
         // Personal
-        public required string Firstname { get; set; } = "";
-        public required string Lastname { get; set; } = "";
+        public string Firstname { get; set; } = "";
+        public string Lastname { get; set; } = "";
         public DateTime DateOfBirth { get; set; }
-        public required string Gender { get; set; } = "";
-        public required string Country { get; set; } = "";
-        public required string City { get; set; } = "";
-        public required string Street { get; set; } = "";
+        public string Gender { get; set; } = "";
+        public string Country { get; set; } = "";
+        public string City { get; set; } = "";
+        public string Street { get; set; } = "";
         public string Zipcode { get; set; } = "";
 
         // Passport
@@ -36,8 +36,8 @@ namespace soladal_core.Data
 
         // Contact
         public string Phone { get; set; } = "";
-        public required string Gmail { get; set; } = "";
-        public required string PasswordGmail { get; set; } = "";
+        public string Gmail { get; set; } = "";
+        public string PasswordGmail { get; set; } = "";
         public string TwoFactorGmail { get; set; } = "";
 
         // Job
@@ -48,7 +48,7 @@ namespace soladal_core.Data
         public DateTime JobEndDate { get; set; }
 
         // Other
-        public required bool IsFavorite { get; set; } = false;
+        public bool IsFavorite { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
     }
