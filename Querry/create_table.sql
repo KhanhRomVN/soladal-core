@@ -1,3 +1,15 @@
+CREATE TABLE `defaultdb`.`Groups` (
+    `Id` INT AUTO_INCREMENT PRIMARY KEY,
+    `UserId` INT NOT NULL,
+    `Title` VARCHAR(255) NOT NULL,
+    `Type` VARCHAR(50) NOT NULL,
+    `LucideIcon` VARCHAR(255) DEFAULT '<Archive className="h-4 w-4 text-icon-primary" />',
+    `CanDelete` BOOLEAN NOT NULL,
+    `IsFavorite` BOOLEAN DEFAULT FALSE,
+    `CreatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `UpdatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 CREATE TABLE `defaultdb`.`Accounts` (
     `Id` INT PRIMARY KEY AUTO_INCREMENT,
     `UserId` INT NOT NULL,
@@ -16,28 +28,111 @@ CREATE TABLE `defaultdb`.`Accounts` (
     `UpdatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `defaultdb`.`Notes` (
+CREATE TABLE `defaultdb`.`Googles` (
     `Id` INT PRIMARY KEY AUTO_INCREMENT,
     `UserId` INT NOT NULL,
-    `Title` VARCHAR(255) NOT NULL,
-    `Group` VARCHAR(255) NOT NULL DEFAULT 'default',
-    `Notes` TEXT,
+    `Type` VARCHAR(255) NOT NULL,
+    `GroupId` INT NOT NULL DEFAULT -1,
+    `Email` VARCHAR(255) NOT NULL DEFAULT '',
+    `Phone` VARCHAR(50) DEFAULT '',
+    `Password` VARCHAR(255) NOT NULL DEFAULT '',
+    `Country` VARCHAR(255) DEFAULT '',
+    `Agent` VARCHAR(255) DEFAULT '',
+    `TwoFactor` VARCHAR(255) DEFAULT '',
     `IsFavorite` BOOLEAN NOT NULL DEFAULT FALSE,
     `CreatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `UpdatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `defaultdb`.`Groups` (
-    `Id` INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE `defaultdb`.`Notes` (
+    `Id` INT PRIMARY KEY AUTO_INCREMENT,
     `UserId` INT NOT NULL,
     `Title` VARCHAR(255) NOT NULL,
-    `Type` VARCHAR(50) NOT NULL,
-    `LucideIcon` VARCHAR(255) DEFAULT '<Archive className="h-4 w-4 text-icon-primary" />',
-    `CanDelete` BOOLEAN NOT NULL,
-    `IsFavorite` BOOLEAN DEFAULT FALSE,
+    `Type` VARCHAR(255) NOT NULL,
+    `GroupId` INT NOT NULL DEFAULT -1,
+    `Notes` VARCHAR(255) DEFAULT '',
+    `IsFavorite` BOOLEAN NOT NULL DEFAULT FALSE,
     `CreatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `UpdatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE `defaultdb`.`Identities` (
+    `Id` INT PRIMARY KEY AUTO_INCREMENT,
+    `UserId` INT NOT NULL,
+    `GroupId` INT NOT NULL DEFAULT -1,
+    `Type` VARCHAR(255) NOT NULL,
+    -- Personal
+    `Firstname` VARCHAR(255) DEFAULT '',
+    `Lastname` VARCHAR(255) DEFAULT '',
+    `DateOfBirth` DATETIME,
+    `Gender` VARCHAR(50) DEFAULT '',
+    `Country` VARCHAR(255) DEFAULT '',
+    `City` VARCHAR(255) DEFAULT '',
+    `Street` VARCHAR(255) DEFAULT '',
+    `Zipcode` VARCHAR(50) DEFAULT '',
+    -- Passport
+    `PassportID` VARCHAR(255) DEFAULT '',
+    `PassportIssuedBy` VARCHAR(255) DEFAULT '',
+    `PassportIssuedDate` DATETIME,
+    `PassportExpiredDate` DATETIME,
+    -- ID Card
+    `IDCardID` VARCHAR(255) DEFAULT '',
+    `IDCardIssuedBy` VARCHAR(255) DEFAULT '',
+    `IDCardIssuedDate` DATETIME,
+    `IDCardExpiredDate` DATETIME,
+    -- Driving License
+    `DrivingLicenseID` VARCHAR(255) DEFAULT '',
+    `DrivingLicenseIssuedBy` VARCHAR(255) DEFAULT '',
+    `DrivingLicenseIssuedDate` DATETIME,
+    `DrivingLicenseExpiredDate` DATETIME,
+    -- Contact
+    `Phone` VARCHAR(50) DEFAULT '',
+    `Gmail` VARCHAR(255) DEFAULT '',
+    `PasswordGmail` VARCHAR(255) DEFAULT '',
+    `TwoFactorGmail` VARCHAR(255) DEFAULT '',
+    -- Job
+    `JobTitle` VARCHAR(255) DEFAULT '',
+    `JobCompany` VARCHAR(255) DEFAULT '',
+    `JobDescription` VARCHAR(255) DEFAULT '',
+    `JobStartDate` DATETIME,
+    `JobEndDate` DATETIME,
+    -- Other
+    `IsFavorite` BOOLEAN NOT NULL DEFAULT FALSE,
+    `CreatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `UpdatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `defaultdb`.`Clones` (
+    `Id` INT PRIMARY KEY AUTO_INCREMENT,
+    `UserId` INT NOT NULL,
+    `Type` VARCHAR(255) NOT NULL,
+    `GroupId` INT NOT NULL DEFAULT -1,
+    `Email` VARCHAR(255) DEFAULT '',
+    `Password` VARCHAR(255) DEFAULT '',
+    `TwoFactor` VARCHAR(255) DEFAULT '',
+    `Agent` VARCHAR(255) DEFAULT '',
+    `Proxy` VARCHAR(255) DEFAULT '',
+    `Country` VARCHAR(255) DEFAULT '',
+    `Status` VARCHAR(255) DEFAULT '',
+    `IsFavorite` BOOLEAN NOT NULL DEFAULT FALSE,
+    `CreatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `UpdatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `defaultdb`.`Cards` (
+    `Id` INT PRIMARY KEY AUTO_INCREMENT,
+    `UserId` INT NOT NULL,
+    `Title` VARCHAR(255) DEFAULT '',
+    `Type` VARCHAR(255) NOT NULL,
+    `GroupId` INT NOT NULL DEFAULT -1,
+    `FullName` VARCHAR(255) DEFAULT '',
+    `CardNumber` VARCHAR(255) DEFAULT '',
+    `ExpirationDate` VARCHAR(10) DEFAULT '',
+    `Pin` VARCHAR(50) DEFAULT '',
+    `Notes` VARCHAR(4000) DEFAULT '',
+    `IsFavorite` BOOLEAN NOT NULL DEFAULT FALSE,
+    `CreatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `UpdatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
 
