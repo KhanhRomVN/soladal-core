@@ -1,17 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using soladal_core.Data;
-
 namespace soladal_core.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class NotesController : ControllerBase
+    public class GooglesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private readonly AuthToken _authToken;
 
-        public NotesController(ApplicationDbContext context)
+        public GooglesController(ApplicationDbContext context)
         {
             _context = context;
             _authToken = new AuthToken();
@@ -30,24 +28,28 @@ namespace soladal_core.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Note>> CreateNote(Note noteDto)
+        public async Task<ActionResult<Googles>> CreateGoogle(Googles googleDto)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var note = new Note
+                var google = new Googles
                 {
                     UserId = userId,
-                    Title = noteDto.Title,
-                    Type = noteDto.Type,
-                    GroupId = noteDto.GroupId,
-                    Notes = noteDto.Notes ?? "",
-                    IsFavorite = noteDto.IsFavorite
+                    Type = googleDto.Type,
+                    GroupId = googleDto.GroupId,
+                    Email = googleDto.Email ?? "",
+                    Phone = googleDto.Phone ?? "",
+                    Password = googleDto.Password ?? "",
+                    Country = googleDto.Country ?? "",
+                    Agent = googleDto.Agent ?? "",
+                    TwoFactor = googleDto.TwoFactor ?? "",
+                    IsFavorite = googleDto.IsFavorite
                 };
 
-                _context.Notes.Add(note);
+                _context.Googles.Add(google);
                 await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetNoteById), new { id = note.Id }, note);
+                return CreatedAtAction(nameof(GetGoogleById), new { id = google.Id }, google);
             }
             catch (UnauthorizedAccessException)
             {
@@ -56,19 +58,19 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Note>> GetNoteById(int id)
+        public async Task<ActionResult<Googles>> GetGoogleById(int id)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var note = await _context.Notes.FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId);
+                var google = await _context.Googles.FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
 
-                if (note == null)
+                if (google == null)
                 {
                     return NotFound();
                 }
 
-                return note;
+                return google;
             }
             catch (UnauthorizedAccessException)
             {
@@ -77,12 +79,12 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Note>>> GetAllNotes()
+        public async Task<ActionResult<IEnumerable<Googles>>> GetAllGoogles()
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Notes.Where(n => n.UserId == userId).ToListAsync();
+                return await _context.Googles.Where(g => g.UserId == userId).ToListAsync();
             }
             catch (UnauthorizedAccessException)
             {
@@ -91,29 +93,13 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet("group/{group_id}")]
-        public async Task<ActionResult<IEnumerable<Note>>> GetNotesByGroup(int group_id)
+        public async Task<ActionResult<IEnumerable<Googles>>> GetGooglesByGroup(int group_id)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Notes
-                    .Where(n => n.UserId == userId && n.GroupId == group_id)
-                    .ToListAsync();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-        }
-
-        [HttpGet("title/{title}")]
-        public async Task<ActionResult<IEnumerable<Note>>> GetNotesByTitle(string title)
-        {
-            try
-            {
-                int userId = GetUserIdFromToken();
-                return await _context.Notes
-                    .Where(n => n.UserId == userId && n.Title.Contains(title))
+                return await _context.Googles
+                    .Where(g => g.UserId == userId && g.GroupId == group_id)
                     .ToListAsync();
             }
             catch (UnauthorizedAccessException)
@@ -123,23 +109,23 @@ namespace soladal_core.Controllers
         }
 
         [HttpPut("favorite/{id}")]
-        public async Task<ActionResult<Note>> ChangeFavoriteStatus(int id, bool isFavorite)
+        public async Task<ActionResult<Googles>> ChangeFavoriteStatus(int id, bool isFavorite)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var note = await _context.Notes.FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId);
+                var google = await _context.Googles.FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
 
-                if (note == null)
+                if (google == null)
                 {
                     return NotFound();
                 }
 
-                note.IsFavorite = isFavorite;
-                note.UpdatedAt = DateTime.Now;
+                google.IsFavorite = isFavorite;
+                google.UpdatedAt = DateTime.Now;
                 await _context.SaveChangesAsync();
 
-                return note;
+                return google;
             }
             catch (UnauthorizedAccessException)
             {
@@ -148,18 +134,18 @@ namespace soladal_core.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Note>> UpdateNote(int id, Note note)
+        public async Task<ActionResult<Googles>> UpdateGoogle(int id, Googles google)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                if (id != note.Id || userId != note.UserId)
+                if (id != google.Id || userId != google.UserId)
                 {
                     return BadRequest();
                 }
 
-                note.UpdatedAt = DateTime.Now;
-                _context.Entry(note).State = EntityState.Modified;
+                google.UpdatedAt = DateTime.Now;
+                _context.Entry(google).State = EntityState.Modified;
 
                 try
                 {
@@ -167,7 +153,7 @@ namespace soladal_core.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!NoteExists(id))
+                    if (!GoogleExists(id))
                     {
                         return NotFound();
                     }
@@ -177,7 +163,7 @@ namespace soladal_core.Controllers
                     }
                 }
 
-                return note;
+                return google;
             }
             catch (UnauthorizedAccessException)
             {
@@ -186,22 +172,22 @@ namespace soladal_core.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Note>> DeleteNote(int id)
+        public async Task<ActionResult<Googles>> DeleteGoogle(int id)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var note = await _context.Notes.FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId);
+                var google = await _context.Googles.FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
 
-                if (note == null)
+                if (google == null)
                 {
                     return NotFound();
                 }
 
-                _context.Notes.Remove(note);
+                _context.Googles.Remove(google);
                 await _context.SaveChangesAsync();
 
-                return note;
+                return google;
             }
             catch (UnauthorizedAccessException)
             {
@@ -209,9 +195,9 @@ namespace soladal_core.Controllers
             }
         }
 
-        private bool NoteExists(int id)
+        private bool GoogleExists(int id)
         {
-            return _context.Notes.Any(e => e.Id == id);
+            return _context.Googles.Any(e => e.Id == id);
         }
     }
 }

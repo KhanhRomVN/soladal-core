@@ -6,12 +6,12 @@ namespace soladal_core.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class NotesController : ControllerBase
+    public class ClonesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private readonly AuthToken _authToken;
 
-        public NotesController(ApplicationDbContext context)
+        public ClonesController(ApplicationDbContext context)
         {
             _context = context;
             _authToken = new AuthToken();
@@ -30,24 +30,29 @@ namespace soladal_core.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Note>> CreateNote(Note noteDto)
+        public async Task<ActionResult<Clone>> CreateClone(Clone cloneDto)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var note = new Note
+                var clone = new Clone
                 {
                     UserId = userId,
-                    Title = noteDto.Title,
-                    Type = noteDto.Type,
-                    GroupId = noteDto.GroupId,
-                    Notes = noteDto.Notes ?? "",
-                    IsFavorite = noteDto.IsFavorite
+                    Type = cloneDto.Type,
+                    GroupId = cloneDto.GroupId,
+                    Email = cloneDto.Email ?? "",
+                    Password = cloneDto.Password ?? "",
+                    TwoFactor = cloneDto.TwoFactor ?? "",
+                    Agent = cloneDto.Agent ?? "",
+                    Proxy = cloneDto.Proxy ?? "",
+                    Country = cloneDto.Country ?? "",
+                    Status = cloneDto.Status ?? "",
+                    IsFavorite = cloneDto.IsFavorite
                 };
 
-                _context.Notes.Add(note);
+                _context.Clones.Add(clone);
                 await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetNoteById), new { id = note.Id }, note);
+                return CreatedAtAction(nameof(GetCloneById), new { id = clone.Id }, clone);
             }
             catch (UnauthorizedAccessException)
             {
@@ -56,19 +61,19 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Note>> GetNoteById(int id)
+        public async Task<ActionResult<Clone>> GetCloneById(int id)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var note = await _context.Notes.FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId);
+                var clone = await _context.Clones.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
 
-                if (note == null)
+                if (clone == null)
                 {
                     return NotFound();
                 }
 
-                return note;
+                return clone;
             }
             catch (UnauthorizedAccessException)
             {
@@ -77,12 +82,12 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Note>>> GetAllNotes()
+        public async Task<ActionResult<IEnumerable<Clone>>> GetAllClones()
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Notes.Where(n => n.UserId == userId).ToListAsync();
+                return await _context.Clones.Where(c => c.UserId == userId).ToListAsync();
             }
             catch (UnauthorizedAccessException)
             {
@@ -91,29 +96,13 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet("group/{group_id}")]
-        public async Task<ActionResult<IEnumerable<Note>>> GetNotesByGroup(int group_id)
+        public async Task<ActionResult<IEnumerable<Clone>>> GetClonesByGroup(int group_id)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Notes
-                    .Where(n => n.UserId == userId && n.GroupId == group_id)
-                    .ToListAsync();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-        }
-
-        [HttpGet("title/{title}")]
-        public async Task<ActionResult<IEnumerable<Note>>> GetNotesByTitle(string title)
-        {
-            try
-            {
-                int userId = GetUserIdFromToken();
-                return await _context.Notes
-                    .Where(n => n.UserId == userId && n.Title.Contains(title))
+                return await _context.Clones
+                    .Where(c => c.UserId == userId && c.GroupId == group_id)
                     .ToListAsync();
             }
             catch (UnauthorizedAccessException)
@@ -123,23 +112,23 @@ namespace soladal_core.Controllers
         }
 
         [HttpPut("favorite/{id}")]
-        public async Task<ActionResult<Note>> ChangeFavoriteStatus(int id, bool isFavorite)
+        public async Task<ActionResult<Clone>> ChangeFavoriteStatus(int id, bool isFavorite)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var note = await _context.Notes.FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId);
+                var clone = await _context.Clones.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
 
-                if (note == null)
+                if (clone == null)
                 {
                     return NotFound();
                 }
 
-                note.IsFavorite = isFavorite;
-                note.UpdatedAt = DateTime.Now;
+                clone.IsFavorite = isFavorite;
+                clone.UpdatedAt = DateTime.Now;
                 await _context.SaveChangesAsync();
 
-                return note;
+                return clone;
             }
             catch (UnauthorizedAccessException)
             {
@@ -148,18 +137,18 @@ namespace soladal_core.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Note>> UpdateNote(int id, Note note)
+        public async Task<ActionResult<Clone>> UpdateClone(int id, Clone clone)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                if (id != note.Id || userId != note.UserId)
+                if (id != clone.Id || userId != clone.UserId)
                 {
                     return BadRequest();
                 }
 
-                note.UpdatedAt = DateTime.Now;
-                _context.Entry(note).State = EntityState.Modified;
+                clone.UpdatedAt = DateTime.Now;
+                _context.Entry(clone).State = EntityState.Modified;
 
                 try
                 {
@@ -167,7 +156,7 @@ namespace soladal_core.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!NoteExists(id))
+                    if (!CloneExists(id))
                     {
                         return NotFound();
                     }
@@ -177,7 +166,7 @@ namespace soladal_core.Controllers
                     }
                 }
 
-                return note;
+                return clone;
             }
             catch (UnauthorizedAccessException)
             {
@@ -186,22 +175,22 @@ namespace soladal_core.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Note>> DeleteNote(int id)
+        public async Task<ActionResult<Clone>> DeleteClone(int id)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var note = await _context.Notes.FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId);
+                var clone = await _context.Clones.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
 
-                if (note == null)
+                if (clone == null)
                 {
                     return NotFound();
                 }
 
-                _context.Notes.Remove(note);
+                _context.Clones.Remove(clone);
                 await _context.SaveChangesAsync();
 
-                return note;
+                return clone;
             }
             catch (UnauthorizedAccessException)
             {
@@ -209,9 +198,9 @@ namespace soladal_core.Controllers
             }
         }
 
-        private bool NoteExists(int id)
+        private bool CloneExists(int id)
         {
-            return _context.Notes.Any(e => e.Id == id);
+            return _context.Clones.Any(e => e.Id == id);
         }
     }
 }

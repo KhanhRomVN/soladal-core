@@ -6,12 +6,12 @@ namespace soladal_core.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class NotesController : ControllerBase
+    public class CardsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private readonly AuthToken _authToken;
 
-        public NotesController(ApplicationDbContext context)
+        public CardsController(ApplicationDbContext context)
         {
             _context = context;
             _authToken = new AuthToken();
@@ -30,24 +30,28 @@ namespace soladal_core.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Note>> CreateNote(Note noteDto)
+        public async Task<ActionResult<Card>> CreateCard(Card cardDto)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var note = new Note
+                var card = new Card
                 {
                     UserId = userId,
-                    Title = noteDto.Title,
-                    Type = noteDto.Type,
-                    GroupId = noteDto.GroupId,
-                    Notes = noteDto.Notes ?? "",
-                    IsFavorite = noteDto.IsFavorite
+                    Title = cardDto.Title ?? "",
+                    Type = cardDto.Type,
+                    GroupId = cardDto.GroupId,
+                    FullName = cardDto.FullName ?? "",
+                    CardNumber = cardDto.CardNumber ?? "",
+                    ExpirationDate = cardDto.ExpirationDate ?? "",
+                    Pin = cardDto.Pin ?? "",
+                    Notes = cardDto.Notes ?? "",
+                    IsFavorite = cardDto.IsFavorite
                 };
 
-                _context.Notes.Add(note);
+                _context.Cards.Add(card);
                 await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetNoteById), new { id = note.Id }, note);
+                return CreatedAtAction(nameof(GetCardById), new { id = card.Id }, card);
             }
             catch (UnauthorizedAccessException)
             {
@@ -56,19 +60,19 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Note>> GetNoteById(int id)
+        public async Task<ActionResult<Card>> GetCardById(int id)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var note = await _context.Notes.FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId);
+                var card = await _context.Cards.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
 
-                if (note == null)
+                if (card == null)
                 {
                     return NotFound();
                 }
 
-                return note;
+                return card;
             }
             catch (UnauthorizedAccessException)
             {
@@ -77,12 +81,12 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Note>>> GetAllNotes()
+        public async Task<ActionResult<IEnumerable<Card>>> GetAllCards()
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Notes.Where(n => n.UserId == userId).ToListAsync();
+                return await _context.Cards.Where(c => c.UserId == userId).ToListAsync();
             }
             catch (UnauthorizedAccessException)
             {
@@ -91,13 +95,13 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet("group/{group_id}")]
-        public async Task<ActionResult<IEnumerable<Note>>> GetNotesByGroup(int group_id)
+        public async Task<ActionResult<IEnumerable<Card>>> GetCardsByGroup(int group_id)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Notes
-                    .Where(n => n.UserId == userId && n.GroupId == group_id)
+                return await _context.Cards
+                    .Where(c => c.UserId == userId && c.GroupId == group_id)
                     .ToListAsync();
             }
             catch (UnauthorizedAccessException)
@@ -107,13 +111,13 @@ namespace soladal_core.Controllers
         }
 
         [HttpGet("title/{title}")]
-        public async Task<ActionResult<IEnumerable<Note>>> GetNotesByTitle(string title)
+        public async Task<ActionResult<IEnumerable<Card>>> GetCardsByTitle(string title)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Notes
-                    .Where(n => n.UserId == userId && n.Title.Contains(title))
+                return await _context.Cards
+                    .Where(c => c.UserId == userId && c.Title.Contains(title))
                     .ToListAsync();
             }
             catch (UnauthorizedAccessException)
@@ -123,23 +127,23 @@ namespace soladal_core.Controllers
         }
 
         [HttpPut("favorite/{id}")]
-        public async Task<ActionResult<Note>> ChangeFavoriteStatus(int id, bool isFavorite)
+        public async Task<ActionResult<Card>> ChangeFavoriteStatus(int id, bool isFavorite)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var note = await _context.Notes.FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId);
+                var card = await _context.Cards.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
 
-                if (note == null)
+                if (card == null)
                 {
                     return NotFound();
                 }
 
-                note.IsFavorite = isFavorite;
-                note.UpdatedAt = DateTime.Now;
+                card.IsFavorite = isFavorite;
+                card.UpdatedAt = DateTime.Now;
                 await _context.SaveChangesAsync();
 
-                return note;
+                return card;
             }
             catch (UnauthorizedAccessException)
             {
@@ -148,18 +152,18 @@ namespace soladal_core.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Note>> UpdateNote(int id, Note note)
+        public async Task<ActionResult<Card>> UpdateCard(int id, Card card)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                if (id != note.Id || userId != note.UserId)
+                if (id != card.Id || userId != card.UserId)
                 {
                     return BadRequest();
                 }
 
-                note.UpdatedAt = DateTime.Now;
-                _context.Entry(note).State = EntityState.Modified;
+                card.UpdatedAt = DateTime.Now;
+                _context.Entry(card).State = EntityState.Modified;
 
                 try
                 {
@@ -167,7 +171,7 @@ namespace soladal_core.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!NoteExists(id))
+                    if (!CardExists(id))
                     {
                         return NotFound();
                     }
@@ -177,7 +181,7 @@ namespace soladal_core.Controllers
                     }
                 }
 
-                return note;
+                return card;
             }
             catch (UnauthorizedAccessException)
             {
@@ -186,22 +190,22 @@ namespace soladal_core.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Note>> DeleteNote(int id)
+        public async Task<ActionResult<Card>> DeleteCard(int id)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                var note = await _context.Notes.FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId);
+                var card = await _context.Cards.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
 
-                if (note == null)
+                if (card == null)
                 {
                     return NotFound();
                 }
 
-                _context.Notes.Remove(note);
+                _context.Cards.Remove(card);
                 await _context.SaveChangesAsync();
 
-                return note;
+                return card;
             }
             catch (UnauthorizedAccessException)
             {
@@ -209,9 +213,9 @@ namespace soladal_core.Controllers
             }
         }
 
-        private bool NoteExists(int id)
+        private bool CardExists(int id)
         {
-            return _context.Notes.Any(e => e.Id == id);
+            return _context.Cards.Any(e => e.Id == id);
         }
     }
 }
