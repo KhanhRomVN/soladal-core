@@ -37,6 +37,13 @@ namespace soladal_core.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
+
+                var group = await _context.Groups.FirstOrDefaultAsync(g => g.Id == accountDto.GroupId);
+                if (group == null || group.Type != accountDto.Type)
+                {
+                    return BadRequest("Account type must match with Group type");
+                }
+
                 var account = new Account
                 {
                     UserId = userId,
