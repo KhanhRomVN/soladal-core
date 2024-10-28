@@ -1,6 +1,6 @@
 namespace soladal_core.Data
 {
-    public class Clones
+    public class Clone
     {
         public int Id { get; set; }
         public int UserId { get; set; }

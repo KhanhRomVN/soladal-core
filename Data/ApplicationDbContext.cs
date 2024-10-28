@@ -12,5 +12,11 @@ namespace soladal_core.Data
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Note> Notes { get; set; }
+        public DbSet<Card> Cards { get; set; }
+        public DbSet<Clone> Clones { get; set; }
+        public DbSet<Google> Googles { get; set; }
+        public DbSet<Identity> Identities { get; set; }
+
     }
+
 }

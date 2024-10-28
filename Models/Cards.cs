@@ -1,6 +1,6 @@
 namespace soladal_core.Data
 {
-    public class Cards
+    public class Card
     {
         public int Id { get; set; }
         public int UserId { get; set; }
