@@ -102,7 +102,31 @@ namespace soladal_core.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Clones.Where(c => c.UserId == userId).ToListAsync();
+                var clones = await _context.Clones.Where(c => c.UserId == userId).ToListAsync();
+                var cloneDTOs = clones.Select(c => new CloneDTO
+                {
+                    Id = c.Id,
+                    UserId = c.UserId,
+                    Type = c.Type,
+                    GroupId = c.GroupId,
+                    GroupName = c.GroupId != -1 ? _context.Groups.FirstOrDefault(g => g.Id == c.GroupId)?.Title ?? "" : "",
+                    Email = c.Email,
+                    Password = c.Password,
+                    TwoFactor = c.TwoFactor,
+                    Phone = c.Phone,
+                    DisplayName = c.DisplayName,
+                    DateOfBirth = c.DateOfBirth,
+                    Country = c.Country,
+                    Language = c.Language,
+                    Agent = c.Agent,
+                    Proxy = c.Proxy,
+                    Status = c.Status,
+                    Notes = c.Notes,
+                    IsFavorite = c.IsFavorite,
+                    CreatedAt = c.CreatedAt,
+                    UpdatedAt = c.UpdatedAt
+                });
+                return Ok(cloneDTOs);
             }
             catch (UnauthorizedAccessException)
             {
@@ -117,9 +141,33 @@ namespace soladal_core.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Clones
+                var clones = await _context.Clones
                     .Where(c => c.UserId == userId && c.GroupId == groupId)
                     .ToListAsync();
+                var cloneDTOs = clones.Select(c => new CloneDTO
+                {
+                    Id = c.Id,
+                    UserId = c.UserId,
+                    Type = c.Type,
+                    GroupId = c.GroupId,
+                    GroupName = c.GroupId != -1 ? _context.Groups.FirstOrDefault(g => g.Id == c.GroupId)?.Title ?? "" : "",
+                    Email = c.Email,
+                    Password = c.Password,
+                    TwoFactor = c.TwoFactor,
+                    Phone = c.Phone,
+                    DisplayName = c.DisplayName,
+                    DateOfBirth = c.DateOfBirth,
+                    Country = c.Country,
+                    Language = c.Language,
+                    Agent = c.Agent,
+                    Proxy = c.Proxy,
+                    Status = c.Status,
+                    Notes = c.Notes,
+                    IsFavorite = c.IsFavorite,
+                    CreatedAt = c.CreatedAt,
+                    UpdatedAt = c.UpdatedAt
+                });
+                return Ok(cloneDTOs);
             }
             catch (UnauthorizedAccessException)
             {

@@ -29,6 +29,7 @@ namespace soladal_core.Controllers
             return int.Parse(userIdClaim.Value);
         }
 
+        // Create a new note: /api/notes
         [HttpPost]
         public async Task<ActionResult<Note>> CreateNote(Note noteDto)
         {
@@ -62,6 +63,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get a note by id: /api/notes/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Note>> GetNoteById(int id)
         {
@@ -83,13 +85,28 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get all notes: /api/notes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Note>>> GetAllNotes()
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Notes.Where(n => n.UserId == userId).ToListAsync();
+                var notes = await _context.Notes.Where(n => n.UserId == userId).ToListAsync();
+                var noteDTOs = notes.Select(n => new NoteDTO
+                {
+                    Id = n.Id,
+                    UserId = n.UserId,
+                    Title = n.Title,
+                    Type = n.Type,
+                    GroupId = n.GroupId,
+                    GroupName = n.GroupId != -1 ? _context.Groups.FirstOrDefault(gr => gr.Id == n.GroupId)?.Title ?? "" : "",
+                    Notes = n.Notes,
+                    IsFavorite = n.IsFavorite,
+                    CreatedAt = n.CreatedAt,
+                    UpdatedAt = n.UpdatedAt
+                });
+                return Ok(noteDTOs);
             }
             catch (UnauthorizedAccessException)
             {
@@ -97,6 +114,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get notes by group id: /api/notes/group/{group_id}
         [HttpGet("group/{group_id}")]
         public async Task<ActionResult<IEnumerable<Note>>> GetNotesByGroup(int group_id)
         {
@@ -113,15 +131,30 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get notes by title: /api/notes/title/{title}
         [HttpGet("title/{title}")]
         public async Task<ActionResult<IEnumerable<Note>>> GetNotesByTitle(string title)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Notes
+                var notes = await _context.Notes
                     .Where(n => n.UserId == userId && n.Title.Contains(title))
                     .ToListAsync();
+                var noteDTOs = notes.Select(n => new NoteDTO
+                {
+                    Id = n.Id,
+                    UserId = n.UserId,
+                    Title = n.Title,
+                    Type = n.Type,
+                    GroupId = n.GroupId,
+                    GroupName = n.GroupId != -1 ? _context.Groups.FirstOrDefault(gr => gr.Id == n.GroupId)?.Title ?? "" : "",
+                    Notes = n.Notes,
+                    IsFavorite = n.IsFavorite,
+                    CreatedAt = n.CreatedAt,
+                    UpdatedAt = n.UpdatedAt
+                });
+                return Ok(noteDTOs);
             }
             catch (UnauthorizedAccessException)
             {
@@ -129,6 +162,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Change favorite status: /api/notes/favorite/{id}
         [HttpPut("favorite/{id}")]
         public async Task<ActionResult<Note>> ChangeFavoriteStatus(int id, bool isFavorite)
         {
@@ -154,6 +188,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Update a note: /api/notes/{id}
         [HttpPut("{id}")]
         public async Task<ActionResult<Note>> UpdateNote(int id, Note note)
         {
@@ -192,6 +227,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Delete a note: /api/notes/{id}
         [HttpDelete("{id}")]
         public async Task<ActionResult<Note>> DeleteNote(int id)
         {

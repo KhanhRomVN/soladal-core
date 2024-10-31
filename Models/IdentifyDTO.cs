@@ -1,11 +1,12 @@
 namespace soladal_core.Data
 {
-    public class Identity
+    public class IdentifyDTO
     {
         public int Id { get; set; }
         public int UserId { get; set; }
         public required string Type { get; set; }
         public required int GroupId { get; set; } = -1;
+        public string GroupName { get; set; } = "";
         // Personal
         public string Firstname { get; set; } = "";
         public string Lastname { get; set; } = "";
