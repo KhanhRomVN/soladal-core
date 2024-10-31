@@ -69,35 +69,7 @@ namespace soladal_core.Controllers
             }
         }
 
-        private static string GenerateTitleFromUrl(string url)
-        {
-            if (string.IsNullOrEmpty(url))
-            {
-                return string.Empty;
-            }
-            string domain = url.Replace("http://", "").Replace("https://", "");
-
-            domain = domain.Replace("www.", "");
-
-            int indexOfSlash = domain.IndexOf('/');
-            if (indexOfSlash != -1)
-            {
-                domain = domain.Substring(0, indexOfSlash);
-            }
-
-            string[] commonExtensions = { ".com", ".net", ".org", ".edu", ".gov", ".co" };
-            foreach (var ext in commonExtensions)
-            {
-                if (domain.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
-                {
-                    domain = domain.Substring(0, domain.Length - ext.Length);
-                    break;
-                }
-            }
-
-            return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(domain);
-        }
-
+        // Get account by id: /api/accounts/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Account>> GetAccountByID(int id)
         {
@@ -119,20 +91,42 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get all accounts: /api/accounts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Account>>> GetAllAccounts()
+public async Task<ActionResult<IEnumerable<Account>>> GetAllAccounts()
+{
+    try
+    {
+        int userId = GetUserIdFromToken();
+        var accountData = await _context.Accounts.Where(a => a.UserId == userId).ToListAsync();
+        var accountDTOs = accountData.Select(a => new AccountDTO
         {
-            try
-            {
-                int userId = GetUserIdFromToken();
-                return await _context.Accounts.Where(a => a.UserId == userId).ToListAsync();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-        }
+            Id = a.Id,
+            UserId = a.UserId,
+            Title = a.Title,
+            Type = a.Type,
+            GroupId = a.GroupId,
+            GroupName = a.GroupId != -1 ? _context.Groups.FirstOrDefault(g => g.Id == a.GroupId)?.Title ?? "" : "",
+            Website_URL = a.Website_URL,
+            Username = a.Username,
+            Email = a.Email,
+            Phone = a.Phone,
+            Password = a.Password,
+            TwoFactor = a.TwoFactor,
+            Notes = a.Notes,
+            IsFavorite = a.IsFavorite,
+            CreatedAt = a.CreatedAt,
+            UpdatedAt = a.UpdatedAt
+        });
+        return Ok(accountDTOs);
+    }
+    catch (UnauthorizedAccessException)
+    {
+        return Unauthorized();
+    }
+}
 
+        // Get accounts by group id: /api/accounts/group/{group_id}
         [HttpGet("group/{group_id}")]
         public async Task<ActionResult<IEnumerable<Account>>> GetAccountByGroup(int group_id)
         {
@@ -149,6 +143,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get accounts by title: /api/accounts/title/{title}
         [HttpGet("title/{title}")]
         public async Task<ActionResult<IEnumerable<Account>>> GetAccountByTitle(string title)
         {
@@ -165,6 +160,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get accounts by group and title: /api/accounts/group/{group}/title/{title}
         [HttpGet("group/{group}/title/{title}")]
         public async Task<ActionResult<IEnumerable<Account>>> GetAccountByGroupAndTitle(string group, string title)
         {
@@ -181,6 +177,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Change favorite status: /api/accounts/favorite/{id}
         [HttpPut("favorite/{id}")]
         public async Task<ActionResult<Account>> ChangeFavoriteStatus(int id, bool isFavorite)
         {
@@ -206,12 +203,14 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Update account: /api/accounts/{id}
         [HttpPut("{id}")]
         public async Task<ActionResult<Account>> UpdateAccount(int id, Account account)
         {
             try
             {
                 int userId = GetUserIdFromToken();
+                Console.WriteLine(account);
                 if (id != account.Id || userId != account.UserId)
                 {
                     return BadRequest();
@@ -244,6 +243,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Delete account: /api/accounts/{id}
         [HttpDelete("{id}")]
         public async Task<ActionResult<Account>> DeleteAccount(int id)
         {
