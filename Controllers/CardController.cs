@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using soladal_core.Data;
 
 namespace soladal_core.Controllers
 {
@@ -96,7 +95,25 @@ namespace soladal_core.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Cards.Where(c => c.UserId == userId).ToListAsync();
+                var cards = await _context.Cards.Where(c => c.UserId == userId).ToListAsync();
+                var cardDTOs = cards.Select(c => new CardDTO
+                {
+                    Id = c.Id,
+                    UserId = c.UserId,
+                    Title = c.Title,
+                    Type = c.Type,
+                    GroupId = c.GroupId,
+                    GroupName = c.GroupId != -1 ? _context.Groups.FirstOrDefault(g => g.Id == c.GroupId)?.Title ?? "" : "",
+                    FullName = c.FullName,
+                    CardNumber = c.CardNumber,
+                    ExpirationDate = c.ExpirationDate,
+                    Pin = c.Pin,
+                    Notes = c.Notes,
+                    IsFavorite = c.IsFavorite,
+                    CreatedAt = c.CreatedAt,
+                    UpdatedAt = c.UpdatedAt
+                });
+                return Ok(cardDTOs); 
             }
             catch (UnauthorizedAccessException)
             {
@@ -111,9 +128,27 @@ namespace soladal_core.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Cards
+                var cards = await _context.Cards
                     .Where(c => c.UserId == userId && c.GroupId == group_id)
                     .ToListAsync();
+                var cardDTOs = cards.Select(c => new CardDTO
+                {
+                    Id = c.Id,
+                    UserId = c.UserId,
+                    Title = c.Title,
+                    Type = c.Type,
+                    GroupId = c.GroupId,
+                    GroupName = c.GroupId != -1 ? _context.Groups.FirstOrDefault(g => g.Id == c.GroupId)?.Title ?? "" : "",
+                    FullName = c.FullName,
+                    CardNumber = c.CardNumber,
+                    ExpirationDate = c.ExpirationDate,
+                    Pin = c.Pin,
+                    Notes = c.Notes,
+                    IsFavorite = c.IsFavorite,
+                    CreatedAt = c.CreatedAt,
+                    UpdatedAt = c.UpdatedAt
+                });
+                return Ok(cardDTOs);
             }
             catch (UnauthorizedAccessException)
             {

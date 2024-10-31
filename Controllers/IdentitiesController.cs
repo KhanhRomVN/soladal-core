@@ -89,6 +89,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get identity by id: /api/identities/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Identity>> GetIdentityById(int id)
         {
@@ -110,13 +111,55 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get all identities: /api/identities
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Identity>>> GetAllIdentities()
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Identities.Where(i => i.UserId == userId).ToListAsync();
+                var identities = await _context.Identities.Where(i => i.UserId == userId).ToListAsync();
+                var idetifyDTOs = identities.Select(i => new IdentifyDTO
+                {
+                    Id = i.Id,
+                    UserId = i.UserId,
+                    Type = i.Type,
+                    GroupId = i.GroupId,
+                    GroupName = i.GroupId != -1 ? _context.Groups.FirstOrDefault(gr => gr.Id == i.GroupId)?.Title ?? "" : "",
+                    Firstname = i.Firstname,
+                    Lastname = i.Lastname,
+                    DateOfBirth = i.DateOfBirth,
+                    Gender = i.Gender,
+                    Country = i.Country,
+                    City = i.City,
+                    Street = i.Street,
+                    Zipcode = i.Zipcode,
+                    PassportID = i.PassportID,
+                    PassportIssuedBy = i.PassportIssuedBy,
+                    PassportIssuedDate = i.PassportIssuedDate,
+                    PassportExpiredDate = i.PassportExpiredDate,
+                    IDCardID = i.IDCardID,  
+                    IDCardIssuedBy = i.IDCardIssuedBy,
+                    IDCardIssuedDate = i.IDCardIssuedDate,
+                    IDCardExpiredDate = i.IDCardExpiredDate,
+                    DrivingLicenseID = i.DrivingLicenseID,
+                    DrivingLicenseIssuedBy = i.DrivingLicenseIssuedBy,
+                    DrivingLicenseIssuedDate = i.DrivingLicenseIssuedDate,
+                    DrivingLicenseExpiredDate = i.DrivingLicenseExpiredDate,
+                    Phone = i.Phone,
+                    Gmail = i.Gmail,
+                    PasswordGmail = i.PasswordGmail,
+                    TwoFactorGmail = i.TwoFactorGmail,
+                    JobTitle = i.JobTitle,
+                    JobCompany = i.JobCompany,
+                    JobDescription = i.JobDescription,
+                    JobStartDate = i.JobStartDate,
+                    JobEndDate = i.JobEndDate,
+                    IsFavorite = i.IsFavorite,
+                    CreatedAt = i.CreatedAt,
+                    UpdatedAt = i.UpdatedAt
+                });
+                return Ok(idetifyDTOs);
             }
             catch (UnauthorizedAccessException)
             {
@@ -124,15 +167,57 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Get identities by group id: /api/identities/group/{group_id}
         [HttpGet("group/{group_id}")]
         public async Task<ActionResult<IEnumerable<Identity>>> GetIdentitiesByGroup(int group_id)
         {
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Identities
+                var identities = await _context.Identities
                     .Where(i => i.UserId == userId && i.GroupId == group_id)
                     .ToListAsync();
+                var identifyDTOs = identities.Select(i => new IdentifyDTO
+                {
+                    Id = i.Id,
+                    UserId = i.UserId,
+                    Type = i.Type,
+                    GroupId = i.GroupId,
+                    GroupName = i.GroupId != -1 ? _context.Groups.FirstOrDefault(gr => gr.Id == i.GroupId)?.Title ?? "" : "",
+                    Firstname = i.Firstname,
+                    Lastname = i.Lastname,
+                    DateOfBirth = i.DateOfBirth,
+                    Gender = i.Gender,
+                    Country = i.Country,
+                    City = i.City,
+                    Street = i.Street,
+                    Zipcode = i.Zipcode,
+                    PassportID = i.PassportID,
+                    PassportIssuedBy = i.PassportIssuedBy,
+                    PassportIssuedDate = i.PassportIssuedDate,
+                    PassportExpiredDate = i.PassportExpiredDate,
+                    IDCardID = i.IDCardID,
+                    IDCardIssuedBy = i.IDCardIssuedBy,
+                    IDCardIssuedDate = i.IDCardIssuedDate,
+                    IDCardExpiredDate = i.IDCardExpiredDate,
+                    DrivingLicenseID = i.DrivingLicenseID,
+                    DrivingLicenseIssuedBy = i.DrivingLicenseIssuedBy,
+                    DrivingLicenseIssuedDate = i.DrivingLicenseIssuedDate,
+                    DrivingLicenseExpiredDate = i.DrivingLicenseExpiredDate,
+                    Phone = i.Phone,
+                    Gmail = i.Gmail,
+                    PasswordGmail = i.PasswordGmail,
+                    TwoFactorGmail = i.TwoFactorGmail,
+                    JobTitle = i.JobTitle,
+                    JobCompany = i.JobCompany,
+                    JobDescription = i.JobDescription,
+                    JobStartDate = i.JobStartDate,
+                    JobEndDate = i.JobEndDate,
+                    IsFavorite = i.IsFavorite,
+                    CreatedAt = i.CreatedAt,
+                    UpdatedAt = i.UpdatedAt
+                });
+                return Ok(identifyDTOs);
             }
             catch (UnauthorizedAccessException)
             {
@@ -140,6 +225,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Change favorite status: /api/identities/favorite/{id}
         [HttpPut("favorite/{id}")]
         public async Task<ActionResult<Identity>> ChangeFavoriteStatus(int id, bool isFavorite)
         {
@@ -165,6 +251,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Update identity: /api/identities/{id}
         [HttpPut("{id}")]
         public async Task<ActionResult<Identity>> UpdateIdentity(int id, Identity identity)
         {
@@ -203,6 +290,7 @@ namespace soladal_core.Controllers
             }
         }
 
+        // Delete identity: /api/identities/{id}
         [HttpDelete("{id}")]
         public async Task<ActionResult<Identity>> DeleteIdentity(int id)
         {

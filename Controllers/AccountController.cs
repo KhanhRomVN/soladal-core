@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
-using soladal_core.Data;
 
 namespace soladal_core.Controllers
 {
@@ -93,38 +91,38 @@ namespace soladal_core.Controllers
 
         // Get all accounts: /api/accounts
         [HttpGet]
-public async Task<ActionResult<IEnumerable<Account>>> GetAllAccounts()
-{
-    try
-    {
-        int userId = GetUserIdFromToken();
-        var accountData = await _context.Accounts.Where(a => a.UserId == userId).ToListAsync();
-        var accountDTOs = accountData.Select(a => new AccountDTO
+        public async Task<ActionResult<IEnumerable<Account>>> GetAllAccounts()
         {
-            Id = a.Id,
-            UserId = a.UserId,
-            Title = a.Title,
-            Type = a.Type,
-            GroupId = a.GroupId,
-            GroupName = a.GroupId != -1 ? _context.Groups.FirstOrDefault(g => g.Id == a.GroupId)?.Title ?? "" : "",
-            Website_URL = a.Website_URL,
-            Username = a.Username,
-            Email = a.Email,
-            Phone = a.Phone,
-            Password = a.Password,
-            TwoFactor = a.TwoFactor,
-            Notes = a.Notes,
-            IsFavorite = a.IsFavorite,
-            CreatedAt = a.CreatedAt,
-            UpdatedAt = a.UpdatedAt
-        });
-        return Ok(accountDTOs);
-    }
-    catch (UnauthorizedAccessException)
-    {
-        return Unauthorized();
-    }
-}
+            try
+            {
+                int userId = GetUserIdFromToken();
+                var accountData = await _context.Accounts.Where(a => a.UserId == userId).ToListAsync();
+                var accountDTOs = accountData.Select(a => new AccountDTO
+                {
+                    Id = a.Id,
+                    UserId = a.UserId,
+                    Title = a.Title,
+                    Type = a.Type,
+                    GroupId = a.GroupId,
+                    GroupName = a.GroupId != -1 ? _context.Groups.FirstOrDefault(g => g.Id == a.GroupId)?.Title ?? "" : "",
+                    Website_URL = a.Website_URL,
+                    Username = a.Username,
+                    Email = a.Email,
+                    Phone = a.Phone,
+                    Password = a.Password,
+                    TwoFactor = a.TwoFactor,
+                    Notes = a.Notes,
+                    IsFavorite = a.IsFavorite,
+                    CreatedAt = a.CreatedAt,
+                    UpdatedAt = a.UpdatedAt
+                });
+                return Ok(accountDTOs);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+        }
 
         // Get accounts by group id: /api/accounts/group/{group_id}
         [HttpGet("group/{group_id}")]
@@ -133,9 +131,27 @@ public async Task<ActionResult<IEnumerable<Account>>> GetAllAccounts()
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.Accounts
-                    .Where(a => a.UserId == userId && a.GroupId == group_id)
-                    .ToListAsync();
+                var accountData = await _context.Accounts.Where(a => a.UserId == userId && a.GroupId == group_id).ToListAsync();
+                var accountDTOs = accountData.Select(a => new AccountDTO
+                {
+                    Id = a.Id,
+                    UserId = a.UserId,
+                    Title = a.Title,
+                    Type = a.Type,
+                    GroupId = a.GroupId,
+                    GroupName = a.GroupId != -1 ? _context.Groups.FirstOrDefault(g => g.Id == a.GroupId)?.Title ?? "" : "",
+                    Website_URL = a.Website_URL,
+                    Username = a.Username,
+                    Email = a.Email,
+                    Phone = a.Phone,
+                    Password = a.Password,
+                    TwoFactor = a.TwoFactor,
+                    Notes = a.Notes,
+                    IsFavorite = a.IsFavorite,
+                    CreatedAt = a.CreatedAt,
+                    UpdatedAt = a.UpdatedAt
+                });
+                return Ok(accountDTOs);
             }
             catch (UnauthorizedAccessException)
             {

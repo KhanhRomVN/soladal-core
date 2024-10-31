@@ -103,7 +103,32 @@ namespace soladal_core.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.GoogleAccounts.Where(g => g.UserId == userId).ToListAsync();
+                var googles = await _context.GoogleAccounts.Where(g => g.UserId == userId).ToListAsync();
+                var googleDTOs = googles.Select(g => new GoogleAccountDTO
+                {
+                    Id = g.Id,
+                    UserId = g.UserId,
+                    Type = g.Type,
+                    GroupId = g.GroupId,
+                    GroupName = g.GroupId != -1 ? _context.Groups.FirstOrDefault(gr => gr.Id == g.GroupId)?.Title ?? "" : "",
+                    Email = g.Email,
+                    Password = g.Password,
+                    RecoveryEmail = g.RecoveryEmail,
+                    TwoFactor = g.TwoFactor,    
+                    Phone = g.Phone,
+                    DisplayName = g.DisplayName,
+                    DateOfBirth = g.DateOfBirth,
+                    Country = g.Country,
+                    Language = g.Language,
+                    Agent = g.Agent,
+                    Proxy = g.Proxy,
+                    Status = g.Status,
+                    Notes = g.Notes,
+                    IsFavorite = g.IsFavorite,
+                    CreatedAt = g.CreatedAt,
+                    UpdatedAt = g.UpdatedAt
+                });
+                return Ok(googleDTOs);
             }
             catch (UnauthorizedAccessException)
             {
@@ -118,9 +143,34 @@ namespace soladal_core.Controllers
             try
             {
                 int userId = GetUserIdFromToken();
-                return await _context.GoogleAccounts
+                var googles = await _context.GoogleAccounts
                     .Where(g => g.UserId == userId && g.GroupId == groupId)
                     .ToListAsync();
+                var googleDTOs = googles.Select(g => new GoogleAccountDTO
+                {
+                    Id = g.Id,
+                    UserId = g.UserId,
+                    Type = g.Type,
+                    GroupId = g.GroupId,
+                    GroupName = g.GroupId != -1 ? _context.Groups.FirstOrDefault(gr => gr.Id == g.GroupId)?.Title ?? "" : "",
+                    Email = g.Email,
+                    Password = g.Password,
+                    RecoveryEmail = g.RecoveryEmail,
+                    TwoFactor = g.TwoFactor,
+                    Phone = g.Phone,
+                    DisplayName = g.DisplayName,
+                    DateOfBirth = g.DateOfBirth,
+                    Country = g.Country,
+                    Language = g.Language,
+                    Agent = g.Agent,
+                    Proxy = g.Proxy,
+                    Status = g.Status,
+                    Notes = g.Notes,
+                    IsFavorite = g.IsFavorite,
+                    CreatedAt = g.CreatedAt,
+                    UpdatedAt = g.UpdatedAt
+                });
+                return Ok(googleDTOs);
             }
             catch (UnauthorizedAccessException)
             {
